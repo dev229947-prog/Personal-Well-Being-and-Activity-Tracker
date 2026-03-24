@@ -1,0 +1,53 @@
+/* ═══════════════════════════════════════════════
+   Navbar
+   ═══════════════════════════════════════════════ */
+
+.navbar {
+  background: var(--wb-gradient) !important;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 1rem !important;
+  transition: all var(--wb-transition);
+  position: relative;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+
+.navbar-brand {
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+body.dark .navbar {
+  background: var(--wb-gradient-dark) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+/* ── Dropdown menus ── */
+body.dark .navbar .dropdown-menu {
+  background: var(--wb-surface-dark);
+  border-color: var(--wb-border-dark);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+body.dark .navbar .dropdown-item {
+  color: var(--wb-text-dark);
+}
+
+body.dark .navbar .dropdown-item:hover {
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--wb-primary-light);
+}

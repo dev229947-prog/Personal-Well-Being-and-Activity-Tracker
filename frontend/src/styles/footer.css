@@ -1,0 +1,14 @@
+/* ═══════════════════════════════════════════════
+   Footer
+   ═══════════════════════════════════════════════ */
+
+.wb-footer {
+  background: var(--wb-surface);
+  border-top: 2px solid transparent;
+  border-image: var(--wb-gradient) 1;
+}
+
+body.dark .wb-footer {
+  background: var(--wb-surface-dark) !important;
+  border-image: var(--wb-gradient-dark) 1;
+}

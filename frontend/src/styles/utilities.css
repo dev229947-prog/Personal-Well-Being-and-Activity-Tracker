@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════
+   Utilities — Color helpers, layout, animations
+   ═══════════════════════════════════════════════ */
+
+/* ── Text Colors (using variables) ── */
+.text-wb-primary {
+  color: var(--wb-primary) !important;
+}
+
+.text-wb-accent {
+  color: var(--wb-accent) !important;
+}
+
+.text-wb-success {
+  color: var(--wb-success) !important;
+}
+
+.text-wb-danger {
+  color: var(--wb-danger) !important;
+}
+
+.text-wb-info {
+  color: var(--wb-info) !important;
+}
+
+.text-wb-purple {
+  color: var(--wb-purple) !important;
+}
+
+.text-wb-pink {
+  color: var(--wb-pink) !important;
+}
+
+.text-wb-teal {
+  color: var(--wb-teal) !important;
+}
+
+.text-wb-orange {
+  color: var(--wb-orange) !important;
+}
+
+/* ── Background Colors ── */
+.bg-wb-primary-soft {
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+.bg-wb-success-soft {
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.bg-wb-accent-soft {
+  background: rgba(245, 158, 11, 0.1) !important;
+}
+
+.bg-wb-danger-soft {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.bg-wb-purple-soft {
+  background: rgba(139, 92, 246, 0.1) !important;
+}
+
+.bg-wb-info-soft {
+  background: rgba(6, 182, 212, 0.1) !important;
+}
+
+.bg-wb-pink-soft {
+  background: rgba(236, 72, 153, 0.1) !important;
+}
+
+.bg-wb-teal-soft {
+  background: rgba(20, 184, 166, 0.1) !important;
+}
+
+/* ── Dark mode soft backgrounds (more visible) ── */
+body.dark .bg-wb-primary-soft {
+  background: rgba(99, 102, 241, 0.18) !important;
+}
+
+body.dark .bg-wb-success-soft {
+  background: rgba(16, 185, 129, 0.18) !important;
+}
+
+body.dark .bg-wb-accent-soft {
+  background: rgba(245, 158, 11, 0.18) !important;
+}
+
+body.dark .bg-wb-danger-soft {
+  background: rgba(239, 68, 68, 0.18) !important;
+}
+
+body.dark .bg-wb-purple-soft {
+  background: rgba(139, 92, 246, 0.18) !important;
+}
+
+body.dark .bg-wb-info-soft {
+  background: rgba(6, 182, 212, 0.18) !important;
+}
+
+/* ── Gradient Text ── */
+.text-gradient {
+  background: var(--wb-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Color Badges / Chips ── */
+.wb-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.wb-badge-primary {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--wb-primary);
+}
+
+.wb-badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--wb-success);
+}
+
+.wb-badge-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--wb-danger);
+}
+
+.wb-badge-accent {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--wb-accent);
+}
+
+.wb-badge-purple {
+  background: rgba(139, 92, 246, 0.12);
+  color: var(--wb-purple);
+}
+
+.wb-badge-info {
+  background: rgba(6, 182, 212, 0.12);
+  color: var(--wb-info);
+}
+
+body.dark .wb-badge-primary {
+  background: rgba(99, 102, 241, 0.22);
+  color: #a5b4fc;
+}
+
+body.dark .wb-badge-success {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6ee7b7;
+}
+
+body.dark .wb-badge-danger {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+}
+
+body.dark .wb-badge-accent {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fcd34d;
+}
+
+body.dark .wb-badge-purple {
+  background: rgba(139, 92, 246, 0.22);
+  color: #c4b5fd;
+}
+
+body.dark .wb-badge-info {
+  background: rgba(6, 182, 212, 0.22);
+  color: #67e8f9;
+}
+
+/* ── Page Header ── */
+.wb-page-header {
+  background: var(--wb-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+}
+
+body.dark .wb-page-header {
+  background: linear-gradient(135deg, #a78bfa 0%, #c4b5fd 50%, #e0e7ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section Subtitle ── */
+.wb-subtitle {
+  max-width: var(--wb-subtitle-max);
+}
+
+/* ── Card Title (consistent heading inside cards) ── */
+.wb-card-title {
+  color: var(--wb-primary);
+  font-weight: 700;
+}
+
+body.dark .wb-card-title {
+  color: var(--wb-primary-light);
+}
+
+/* ── Avatar ── */
+.wb-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--wb-radius-lg);
+  background: var(--wb-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: fadeInUp 0.5s ease forwards;
+}

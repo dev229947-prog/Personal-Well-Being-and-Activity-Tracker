@@ -1,0 +1,84 @@
+/* ═══════════════════════════════════════════════
+   Design Tokens — Single source of truth
+   ═══════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand Colors ── */
+  --wb-primary: #6366f1;
+  --wb-primary-dark: #4f46e5;
+  --wb-primary-light: #a78bfa;
+  --wb-accent: #f59e0b;
+  --wb-accent-dark: #d97706;
+  --wb-success: #10b981;
+  --wb-success-dark: #059669;
+  --wb-danger: #ef4444;
+  --wb-danger-dark: #dc2626;
+  --wb-info: #06b6d4;
+  --wb-info-dark: #0891b2;
+  --wb-purple: #8b5cf6;
+  --wb-pink: #ec4899;
+  --wb-teal: #14b8a6;
+  --wb-orange: #f97316;
+
+  /* ── Gradients ── */
+  --wb-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  --wb-gradient-dark: linear-gradient(135deg, #312e81 0%, #4c1d95 50%, #6d28d9 100%);
+  --wb-gradient-warm: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+  --wb-gradient-cool: linear-gradient(135deg, #06b6d4 0%, #6366f1 100%);
+  --wb-gradient-fresh: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+  --wb-gradient-sunset: linear-gradient(135deg, #ec4899 0%, #f59e0b 100%);
+  --wb-gradient-ocean: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+  --wb-gradient-accent-bg: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, transparent 100%);
+  --wb-gradient-accent-bg-dark: linear-gradient(90deg, rgba(245, 158, 11, 0.1) 0%, transparent 100%);
+
+  /* ── Table gradients ── */
+  --wb-table-header: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --wb-table-header-dark: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%);
+  --wb-table-stripe: rgba(99, 102, 241, 0.04);
+  --wb-table-stripe-dark: rgba(99, 102, 241, 0.08);
+  --wb-table-hover: rgba(99, 102, 241, 0.08);
+  --wb-table-hover-dark: rgba(139, 92, 246, 0.15);
+
+  /* ── Border Radius ── */
+  --wb-radius-sm: 10px;
+  --wb-radius: 16px;
+  --wb-radius-lg: 20px;
+  --wb-radius-xl: 24px;
+
+  /* ── Shadows ── */
+  --wb-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --wb-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.1);
+  --wb-shadow-primary: 0 4px 16px rgba(99, 102, 241, 0.4);
+  --wb-shadow-accent: 0 4px 16px rgba(245, 158, 11, 0.4);
+  --wb-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --wb-shadow-color: 0 4px 20px rgba(99, 102, 241, 0.12);
+
+  /* ── Transitions ── */
+  --wb-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ── Surface Colors (Light) ── */
+  --wb-bg: #f0f2ff;
+  --wb-text: #1e293b;
+  --wb-surface: #ffffff;
+  --wb-surface-accent: #f8f7ff;
+  --wb-border: rgba(99, 102, 241, 0.1);
+  --wb-muted: #64748b;
+
+  /* ── Surface Colors (Dark) ── */
+  --wb-bg-dark: #0c1222;
+  --wb-text-dark: #e2e8f0;
+  --wb-surface-dark: #162032;
+  --wb-surface-dark-accent: #1a2540;
+  --wb-border-dark: rgba(139, 92, 246, 0.2);
+  --wb-muted-dark: #94a3b8;
+
+  /* ── Banner Heights ── */
+  --wb-banner-sm: 180px;
+  --wb-banner-md: 240px;
+  --wb-banner-lg: 300px;
+
+  /* ── Container Widths ── */
+  --wb-narrow: 700px;
+  --wb-content-max: 620px;
+  --wb-subtitle-max: 560px;
+}

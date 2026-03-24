@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════════
+   Buttons — Custom button variants
+   ═══════════════════════════════════════════════ */
+
+.btn-wb-primary {
+  background: var(--wb-gradient);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--wb-radius-sm);
+  transition: all var(--wb-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-wb-primary::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-wb-primary:hover::before {
+  left: 100%;
+}
+
+.btn-wb-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--wb-shadow-primary);
+  color: #fff;
+}
+
+.btn-wb-accent {
+  background: var(--wb-gradient-warm);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--wb-radius-sm);
+  transition: all var(--wb-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-wb-accent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-wb-accent:hover::before {
+  left: 100%;
+}
+
+.btn-wb-accent:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--wb-shadow-accent);
+  color: #fff;
+}
+
+.btn-wb-success {
+  background: var(--wb-gradient-fresh);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--wb-radius-sm);
+  transition: all var(--wb-transition);
+}
+
+.btn-wb-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  color: #fff;
+}
+
+.btn-wb-outline {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--wb-radius-sm);
+  transition: all var(--wb-transition);
+}
+
+.btn-wb-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #fff;
+  color: #fff;
+}
+
+/* ── Dark mode button glow ── */
+body.dark .btn-wb-primary:hover {
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+}
+
+body.dark .btn-wb-accent:hover {
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
+}

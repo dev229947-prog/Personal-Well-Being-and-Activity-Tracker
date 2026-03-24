@@ -1,0 +1,391 @@
+/* ═══════════════════════════════════════════
+   Current Activity Widget — Floating
+   ═══════════════════════════════════════════ */
+
+.caw-widget {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Close ── */
+.caw-close {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+}
+.caw-widget:hover .caw-close {
+  opacity: 1;
+}
+
+/* ── Pulsating Circle ── */
+.caw-circle {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  background: var(--wb-card-bg, #fff);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+.caw-circle:hover {
+  transform: scale(1.08);
+}
+
+.caw-icon {
+  font-size: 1.2rem;
+  color: var(--caw-color, #6366f1);
+  z-index: 1;
+}
+
+/* SVG ring for progress */
+.caw-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.caw-ring-bg {
+  fill: none;
+  stroke: rgba(128,128,128,0.15);
+  stroke-width: 2.5;
+}
+.caw-ring-fg {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 1s ease;
+}
+
+/* Pulse animation */
+.caw-pulse {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2.5px solid;
+  opacity: 0.5;
+  animation: caw-pulse-anim 2s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes caw-pulse-anim {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ── Expanded panel ── */
+.caw-panel {
+  background: var(--wb-card-bg, #fff);
+  border-radius: 14px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  min-width: 180px;
+  max-width: 240px;
+  cursor: pointer;
+  animation: caw-slide-in 0.25s ease;
+}
+@keyframes caw-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.caw-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--wb-text-muted, #6c757d);
+  margin-bottom: 4px;
+}
+
+.caw-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--wb-text, #212529);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.caw-time-range {
+  font-size: 0.78rem;
+  color: var(--wb-text-muted, #6c757d);
+  margin-bottom: 4px;
+}
+
+.caw-countdown {
+  font-size: 1.1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--wb-text, #212529);
+  margin-bottom: 6px;
+}
+
+/* Progress bar inside panel */
+.caw-progress-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(128,128,128,0.12);
+  overflow: hidden;
+}
+.caw-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+}
+
+/* ═══ Dark mode ═══ */
+[data-theme="dark"] .caw-circle {
+  background: #1e293b;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+}
+[data-theme="dark"] .caw-panel {
+  background: #1e293b;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .caw-close {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ═══ Mobile adjustments ═══ */
+@media (max-width: 576px) {
+  .caw-widget {
+    bottom: 16px;
+    left: 16px;
+  }
+  .caw-circle {
+    width: 48px;
+    height: 48px;
+  }
+  .caw-icon {
+    font-size: 1rem;
+  }
+  .caw-panel {
+    min-width: 160px;
+    padding: 10px 14px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Task Completion Popup — Overlay
+   ═══════════════════════════════════════════ */
+
+.caw-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: caw-fade-in 0.3s ease;
+}
+
+@keyframes caw-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.caw-completion-popup {
+  background: var(--wb-card-bg, #fff);
+  border-radius: 20px;
+  padding: 32px 36px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  max-width: 360px;
+  width: 90%;
+  animation: caw-pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes caw-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.caw-completion-icon {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+  animation: caw-bell-ring 0.6s ease 0.3s;
+}
+
+@keyframes caw-bell-ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(15deg); }
+  40% { transform: rotate(-15deg); }
+  60% { transform: rotate(10deg); }
+  80% { transform: rotate(-5deg); }
+}
+
+.caw-completion-heading {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--wb-text, #212529);
+  margin-bottom: 6px;
+}
+
+.caw-completion-task {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--wb-primary, #6366f1);
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+
+.caw-completion-question {
+  font-size: 0.95rem;
+  color: var(--wb-text-muted, #6c757d);
+  margin-bottom: 20px;
+}
+
+.caw-completion-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.caw-btn-yes,
+.caw-btn-no {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.caw-btn-yes {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff;
+}
+.caw-btn-yes:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
+}
+
+.caw-btn-no {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+  color: #fff;
+}
+.caw-btn-no:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(248, 113, 113, 0.4);
+}
+
+/* ═══ Result Toast ═══ */
+
+.caw-result-toast {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10001;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  animation: caw-toast-in 0.4s ease, caw-toast-out 0.4s ease 2.6s forwards;
+}
+
+.caw-result-done {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.caw-result-skip {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+@keyframes caw-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes caw-toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+}
+
+/* ═══ Dark mode — completion ═══ */
+[data-theme="dark"] .caw-completion-popup {
+  background: #1e293b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* ═══ Mobile — completion ═══ */
+@media (max-width: 576px) {
+  .caw-completion-popup {
+    padding: 24px 20px 20px;
+  }
+  .caw-completion-buttons {
+    flex-direction: column;
+  }
+  .caw-btn-yes,
+  .caw-btn-no {
+    justify-content: center;
+  }
+}

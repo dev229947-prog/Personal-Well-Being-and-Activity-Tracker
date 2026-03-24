@@ -1,0 +1,163 @@
+/* ═══════════════════════════════════════════════
+   Base — Reset, body, layout, dark mode globals
+   ═══════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  transition: background-color var(--wb-transition), color var(--wb-transition);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+/* ── Light Mode (default) ── */
+body.light {
+  background-color: var(--wb-bg);
+  color: var(--wb-text);
+}
+
+/* ── Dark Mode ── */
+body.dark {
+  background-color: var(--wb-bg-dark);
+  color: var(--wb-text-dark);
+}
+
+body.dark .text-muted {
+  color: var(--wb-muted-dark) !important;
+}
+
+body.dark .form-control,
+body.dark .form-select {
+  background-color: var(--wb-surface-dark);
+  border-color: rgba(139, 92, 246, 0.2);
+  color: var(--wb-text-dark);
+}
+
+body.dark .form-control:focus,
+body.dark .form-select:focus {
+  background-color: var(--wb-surface-dark-accent);
+  border-color: var(--wb-primary-light);
+  color: var(--wb-text-dark);
+  box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.2);
+}
+
+/* ── Table Light Mode ── */
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table thead th {
+  background: var(--wb-table-header);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  white-space: nowrap;
+  padding: 0.75rem 1rem;
+  letter-spacing: 0.02em;
+}
+
+.table thead th:first-child {
+  border-radius: var(--wb-radius-sm) 0 0 0;
+}
+
+.table thead th:last-child {
+  border-radius: 0 var(--wb-radius-sm) 0 0;
+}
+
+.table tbody tr {
+  transition: all var(--wb-transition);
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: var(--wb-table-stripe);
+}
+
+.table tbody tr:hover {
+  background-color: var(--wb-table-hover) !important;
+  transform: scale(1.002);
+}
+
+.table tbody td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--wb-border);
+  vertical-align: middle;
+}
+
+/* ── Table Dark Mode ── */
+body.dark .table {
+  color: var(--wb-text-dark);
+}
+
+body.dark .table thead th {
+  background: var(--wb-table-header-dark);
+  color: #fff;
+}
+
+body.dark .table tbody tr:nth-child(even) {
+  background-color: var(--wb-table-stripe-dark);
+}
+
+body.dark .table tbody tr:hover {
+  background-color: var(--wb-table-hover-dark) !important;
+}
+
+body.dark .table tbody td {
+  border-bottom-color: var(--wb-border-dark);
+}
+
+/* ── Scrollbar Styling ── */
+body.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+body.dark ::-webkit-scrollbar-track {
+  background: var(--wb-bg-dark);
+}
+body.dark ::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+}
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.5);
+}
+
+/* ── Selection Color ── */
+::selection {
+  background: rgba(99, 102, 241, 0.2);
+  color: inherit;
+}
+
+body.dark ::selection {
+  background: rgba(139, 92, 246, 0.3);
+}
+
+/* ── Layout ── */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem 0;
+}
+
+/* ── Narrow Container ── */
+.wb-narrow {
+  max-width: var(--wb-narrow);
+}

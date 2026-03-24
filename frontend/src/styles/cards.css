@@ -1,0 +1,129 @@
+/* ═══════════════════════════════════════════════
+   Cards — All card variants
+   ═══════════════════════════════════════════════ */
+
+/* ── Hoverable Card ── */
+.wb-card {
+  background: var(--wb-surface);
+  border-radius: var(--wb-radius);
+  border: 1px solid var(--wb-border);
+  box-shadow: var(--wb-shadow);
+  transition: transform var(--wb-transition), box-shadow var(--wb-transition), border-color var(--wb-transition);
+}
+
+.wb-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--wb-shadow-lg), var(--wb-shadow-glow);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* ── Static Card (no hover effect) ── */
+.wb-card-static {
+  background: var(--wb-surface);
+  border-radius: var(--wb-radius);
+  border: 1px solid var(--wb-border);
+  box-shadow: var(--wb-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.wb-card-static::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--wb-gradient);
+  opacity: 0.6;
+}
+
+/* ── Stat Card (gradient top bar) ── */
+.wb-stat-card {
+  background: var(--wb-surface);
+  border-radius: var(--wb-radius);
+  border: 1px solid var(--wb-border);
+  box-shadow: var(--wb-shadow);
+  transition: transform var(--wb-transition), box-shadow var(--wb-transition), border-color var(--wb-transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.wb-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--wb-gradient);
+}
+
+.wb-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--wb-shadow-lg), var(--wb-shadow-glow);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+/* ── Stat card color variants ── */
+.wb-stat-card.variant-primary::before { background: var(--wb-gradient); }
+.wb-stat-card.variant-success::before { background: var(--wb-gradient-fresh); }
+.wb-stat-card.variant-accent::before { background: var(--wb-gradient-warm); }
+.wb-stat-card.variant-danger::before { background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%); }
+.wb-stat-card.variant-purple::before { background: var(--wb-gradient-ocean); }
+.wb-stat-card.variant-info::before { background: var(--wb-gradient-cool); }
+
+/* ── Insight Card (accent left border) ── */
+.wb-insight-card {
+  border-left: 4px solid var(--wb-accent);
+  background: var(--wb-gradient-accent-bg);
+  border-radius: 0 var(--wb-radius) var(--wb-radius) 0;
+}
+
+/* ── Auth Card ── */
+.wb-auth-card {
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--wb-surface);
+  border-radius: var(--wb-radius-lg);
+  border: 1px solid var(--wb-border);
+  box-shadow: var(--wb-shadow-lg), var(--wb-shadow-glow);
+  overflow: hidden;
+}
+
+.wb-auth-header {
+  background: var(--wb-gradient);
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ── Dark Mode Overrides ── */
+body.dark .card,
+body.dark .wb-card,
+body.dark .wb-card-static,
+body.dark .wb-stat-card,
+body.dark .wb-auth-card {
+  background: var(--wb-surface-dark) !important;
+  border-color: var(--wb-border-dark) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 0 20px rgba(139, 92, 246, 0.05);
+}
+
+body.dark .wb-card:hover,
+body.dark .wb-stat-card:hover {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+body.dark .wb-card-static::before {
+  background: var(--wb-gradient-dark);
+  opacity: 0.8;
+}
+
+body.dark .wb-insight-card {
+  background: var(--wb-gradient-accent-bg-dark);
+}
+
+body.dark .wb-auth-card {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(139, 92, 246, 0.1);
+}
