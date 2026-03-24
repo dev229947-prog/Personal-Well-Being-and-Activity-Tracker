@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:8000";
+// Use the same origin in production, localhost in development
+const API_BASE = process.env.NODE_ENV === 'production' 
+  ? window.location.origin
+  : "http://localhost:8000";
 
 const api = axios.create({
   baseURL: API_BASE,

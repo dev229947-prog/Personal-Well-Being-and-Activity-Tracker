@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const { connectDB } = require("./database");
 const { createIndexes } = require("./models");
 const config = require("./config");
@@ -20,8 +21,16 @@ const bmiRoutes = require("./routes/bmi");
 const app = express();
 
 // Middleware
-app.use(cors({ origin: ["http://localhost:3000"], credentials: true }));
+app.use(cors({ 
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL || "https://personal-well-being-and-activity-tracker.onrender.com"]
+    : ["http://localhost:3000"], 
+  credentials: true 
+}));
 app.use(express.json());
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 // Routes
 app.use("/auth", authRoutes);
@@ -37,8 +46,13 @@ app.use("/records", recordRoutes);
 app.use("/bmi", bmiRoutes);
 
 // Health check
-app.get("/", (_req, res) => {
+app.get("/api", (_req, res) => {
   res.json({ message: "Welcome to the Well-Being & Activity Tracker API" });
+});
+
+// Serve index.html for React routing
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
 });
 
 // Start server
