@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { User } = require("../models");
+const { getCollections } = require("../models");
 const { hashPassword, verifyPassword, createAccessToken } = require("../auth");
-const { Op } = require("sequelize");
 
 // POST /auth/signup
 router.post("/signup", async (req, res) => {
@@ -13,17 +12,18 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ detail: "username, email and password are required" });
     }
 
-    const existing = await User.findOne({
-      where: { [Op.or]: [{ username }, { email }] },
+    const collections = await getCollections();
+    const existing = await collections.users.findOne({
+      $or: [{ username }, { email }]
     });
     if (existing) {
       return res.status(400).json({ detail: "Username or email already registered" });
     }
 
     const hashed_password = await hashPassword(password);
-    const user = await User.create({ username, email, hashed_password });
+    const result = await collections.users.insertOne({ username, email, hashed_password, createdAt: new Date(), updatedAt: new Date() });
 
-    return res.status(201).json({ id: user.id, username: user.username, email: user.email });
+    return res.status(201).json({ _id: result.insertedId, username, email });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -39,7 +39,8 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ detail: "username and password are required" });
     }
 
-    const user = await User.findOne({ where: { username } });
+    const collections = await getCollections();
+    const user = await collections.users.findOne({ username });
     if (!user || !(await verifyPassword(password, user.hashed_password))) {
       return res.status(401).json({ detail: "Invalid credentials" });
     }

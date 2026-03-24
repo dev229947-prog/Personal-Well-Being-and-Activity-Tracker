@@ -1,184 +1,97 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("./database");
+const { connectDB } = require("./database");
+const { ObjectId } = require("mongodb");
 
-/* ── User ── */
-const User = sequelize.define("User", {
-  id:              { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  username:        { type: DataTypes.STRING, allowNull: false, unique: true },
-  email:           { type: DataTypes.STRING, allowNull: false, unique: true },
-  hashed_password: { type: DataTypes.STRING, allowNull: false },
-}, { tableName: "users", timestamps: false });
+// Helper function to get collections
+async function getCollections() {
+  const db = await connectDB('wellbeing_tracker');
+  return {
+    users: db.collection('users'),
+    scheduleEntries: db.collection('schedule_entries'),
+    healthMetrics: db.collection('health_metrics'),
+    sleepLogs: db.collection('sleep_logs'),
+    nutritionLogs: db.collection('nutrition_logs'),
+    moodLogs: db.collection('mood_logs'),
+    workoutLogs: db.collection('workout_logs'),
+    goals: db.collection('goals'),
+    journalEntries: db.collection('journal_entries'),
+    healthRecords: db.collection('health_records'),
+    weightLogs: db.collection('weight_logs'),
+    taskCompletions: db.collection('task_completions'),
+    milestones: db.collection('milestones'),
+    milestoneUpdates: db.collection('milestone_updates'),
+  };
+}
 
-/* ── Schedule Entry ── */
-const ScheduleEntry = sequelize.define("ScheduleEntry", {
-  id:            { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:     { type: DataTypes.STRING, allowNull: false },
-  title:         { type: DataTypes.STRING, allowNull: false },
-  activity_type: { type: DataTypes.STRING, allowNull: false },
-  day_of_week:   { type: DataTypes.INTEGER, allowNull: false, validate: { min: 0, max: 6 } },
-  start_time:    { type: DataTypes.STRING, allowNull: false },
-  end_time:      { type: DataTypes.STRING, allowNull: false },
-  color:         { type: DataTypes.STRING, defaultValue: "#6366f1" },
-  notes:         { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "schedule_entries", timestamps: true });
+// Create indexes for collections (call once on startup)
+async function createIndexes() {
+  const collections = await getCollections();
+  
+  // User indexes
+  await collections.users.createIndex({ username: 1 }, { unique: true });
+  await collections.users.createIndex({ email: 1 }, { unique: true });
+  
+  // Schedule indexes
+  await collections.scheduleEntries.createIndex({ user_name: 1 });
+  
+  // Health metric indexes
+  await collections.healthMetrics.createIndex({ user_name: 1 });
+  await collections.healthMetrics.createIndex({ date: 1 });
+  
+  // Sleep log indexes
+  await collections.sleepLogs.createIndex({ user_name: 1 });
+  await collections.sleepLogs.createIndex({ date: 1 });
+  
+  // Nutrition log indexes
+  await collections.nutritionLogs.createIndex({ user_name: 1 });
+  await collections.nutritionLogs.createIndex({ date: 1 });
+  
+  // Mood log indexes
+  await collections.moodLogs.createIndex({ user_name: 1 });
+  await collections.moodLogs.createIndex({ date: 1 });
+  
+  // Workout log indexes
+  await collections.workoutLogs.createIndex({ user_name: 1 });
+  await collections.workoutLogs.createIndex({ date: 1 });
+  
+  // Goal indexes
+  await collections.goals.createIndex({ user_name: 1 });
+  
+  // Journal entry indexes
+  await collections.journalEntries.createIndex({ user_name: 1 });
+  await collections.journalEntries.createIndex({ date: 1 });
+  
+  // Health record indexes
+  await collections.healthRecords.createIndex({ user_name: 1 });
+  
+  // Weight log indexes
+  await collections.weightLogs.createIndex({ user_name: 1 });
+  await collections.weightLogs.createIndex({ date: 1 });
+  
+  // Task completion indexes
+  await collections.taskCompletions.createIndex({ user_name: 1 });
+  await collections.taskCompletions.createIndex({ date: 1 });
+  
+  // Milestone indexes
+  await collections.milestones.createIndex({ goal_id: 1 });
+  
+  // Milestone update indexes
+  await collections.milestoneUpdates.createIndex({ milestone_id: 1 });
+}
 
-/* ── Health Metric (steps, calories, weight, heart-rate, etc.) ── */
-const HealthMetric = sequelize.define("HealthMetric", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  metric_type: { type: DataTypes.STRING, allowNull: false },   // steps, calories_burned, weight, heart_rate, bmi, blood_pressure
-  value:       { type: DataTypes.FLOAT, allowNull: false },
-  unit:        { type: DataTypes.STRING, defaultValue: "" },
-  date:        { type: DataTypes.DATEONLY, allowNull: false },
-}, { tableName: "health_metrics", timestamps: true });
+/* ── MongoDB Document Schemas (for reference) ── */
+// User: { _id, username, email, hashed_password, createdAt, updatedAt }
+// ScheduleEntry: { _id, user_name, title, activity_type, day_of_week, start_time, end_time, color, notes, createdAt, updatedAt }
+// HealthMetric: { _id, user_name, metric_type, value, unit, date, createdAt, updatedAt }
+// SleepLog: { _id, user_name, date, hours, quality, rem_hours, deep_hours, light_hours, notes, createdAt, updatedAt }
+// NutritionLog: { _id, user_name, date, meal_type, description, calories, protein_g, carbs_g, fat_g, water_ml, createdAt, updatedAt }
+// MoodLog: { _id, user_name, date, mood_score, stress_level, energy_level, mindfulness_min, notes, createdAt, updatedAt }
+// WorkoutLog: { _id, user_name, date, exercise_type, exercise_name, duration_min, sets, reps, calories_burned, notes, createdAt, updatedAt }
+// Goal: { _id, user_name, title, category, target_value, current_value, unit, start_date, deadline, status, createdAt, updatedAt }
+// JournalEntry: { _id, user_name, date, title, content, mood_tag, tags, createdAt, updatedAt }
+// HealthRecord: { _id, user_name, record_type, title, description, date, time, recurring, status, createdAt, updatedAt }
+// WeightLog: { _id, user_name, date, weight_kg, height_cm, bmi, calories_in, calories_out, goal_type, target_weight, notes, createdAt, updatedAt }
+// TaskCompletion: { _id, user_name, schedule_entry_id, date, completed, title, createdAt, updatedAt }
+// Milestone: { _id, goal_id, title, target_value, completed, sort_order, frequency, createdAt, updatedAt }
+// MilestoneUpdate: { _id, milestone_id, user_name, date, value, note, createdAt, updatedAt }
 
-/* ── Sleep Log ── */
-const SleepLog = sequelize.define("SleepLog", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  date:        { type: DataTypes.DATEONLY, allowNull: false },
-  hours:       { type: DataTypes.FLOAT, allowNull: false },
-  quality:     { type: DataTypes.INTEGER, defaultValue: 3 },  // 1-5 scale
-  rem_hours:   { type: DataTypes.FLOAT, defaultValue: 0 },
-  deep_hours:  { type: DataTypes.FLOAT, defaultValue: 0 },
-  light_hours: { type: DataTypes.FLOAT, defaultValue: 0 },
-  notes:       { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "sleep_logs", timestamps: true });
-
-/* ── Nutrition Log ── */
-const NutritionLog = sequelize.define("NutritionLog", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  date:        { type: DataTypes.DATEONLY, allowNull: false },
-  meal_type:   { type: DataTypes.STRING, allowNull: false },   // breakfast, lunch, dinner, snack
-  description: { type: DataTypes.STRING, defaultValue: "" },
-  calories:    { type: DataTypes.FLOAT, defaultValue: 0 },
-  protein_g:   { type: DataTypes.FLOAT, defaultValue: 0 },
-  carbs_g:     { type: DataTypes.FLOAT, defaultValue: 0 },
-  fat_g:       { type: DataTypes.FLOAT, defaultValue: 0 },
-  water_ml:    { type: DataTypes.FLOAT, defaultValue: 0 },
-}, { tableName: "nutrition_logs", timestamps: true });
-
-/* ── Mood Log ── */
-const MoodLog = sequelize.define("MoodLog", {
-  id:              { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:       { type: DataTypes.STRING, allowNull: false },
-  date:            { type: DataTypes.DATEONLY, allowNull: false },
-  mood_score:      { type: DataTypes.INTEGER, allowNull: false },   // 1-10
-  stress_level:    { type: DataTypes.INTEGER, defaultValue: 5 },    // 1-10
-  energy_level:    { type: DataTypes.INTEGER, defaultValue: 5 },    // 1-10
-  mindfulness_min: { type: DataTypes.FLOAT, defaultValue: 0 },
-  notes:           { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "mood_logs", timestamps: true });
-
-/* ── Workout Log ── */
-const WorkoutLog = sequelize.define("WorkoutLog", {
-  id:            { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:     { type: DataTypes.STRING, allowNull: false },
-  date:          { type: DataTypes.DATEONLY, allowNull: false },
-  exercise_type: { type: DataTypes.STRING, allowNull: false },     // cardio, strength, flexibility, sports
-  exercise_name: { type: DataTypes.STRING, allowNull: false },
-  duration_min:  { type: DataTypes.FLOAT, defaultValue: 0 },
-  sets:          { type: DataTypes.INTEGER, defaultValue: 0 },
-  reps:          { type: DataTypes.INTEGER, defaultValue: 0 },
-  calories_burned:{ type: DataTypes.FLOAT, defaultValue: 0 },
-  notes:         { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "workout_logs", timestamps: true });
-
-/* ── Goal ── */
-const Goal = sequelize.define("Goal", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  title:       { type: DataTypes.STRING, allowNull: false },
-  category:    { type: DataTypes.STRING, allowNull: false },   // fitness, nutrition, sleep, mental, general
-  target_value:{ type: DataTypes.FLOAT, allowNull: false },
-  current_value:{ type: DataTypes.FLOAT, defaultValue: 0 },
-  unit:        { type: DataTypes.STRING, defaultValue: "" },
-  start_date:  { type: DataTypes.DATEONLY },
-  deadline:    { type: DataTypes.DATEONLY },
-  status:      { type: DataTypes.STRING, defaultValue: "active" },  // active, completed, paused
-}, { tableName: "goals", timestamps: true });
-
-/* ── Journal Entry ── */
-const JournalEntry = sequelize.define("JournalEntry", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  date:        { type: DataTypes.DATEONLY, allowNull: false },
-  title:       { type: DataTypes.STRING, defaultValue: "" },
-  content:     { type: DataTypes.TEXT, allowNull: false },
-  mood_tag:    { type: DataTypes.STRING, defaultValue: "" },
-  tags:        { type: DataTypes.STRING, defaultValue: "" },   // comma-separated
-}, { tableName: "journal_entries", timestamps: true });
-
-/* ── Health Record (appointments, vaccines, medications) ── */
-const HealthRecord = sequelize.define("HealthRecord", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:   { type: DataTypes.STRING, allowNull: false },
-  record_type: { type: DataTypes.STRING, allowNull: false },  // appointment, vaccine, medication
-  title:       { type: DataTypes.STRING, allowNull: false },
-  description: { type: DataTypes.TEXT, defaultValue: "" },
-  date:        { type: DataTypes.DATEONLY },
-  time:        { type: DataTypes.STRING, defaultValue: "" },
-  recurring:   { type: DataTypes.BOOLEAN, defaultValue: false },
-  status:      { type: DataTypes.STRING, defaultValue: "active" }, // active, completed, missed
-}, { tableName: "health_records", timestamps: true });
-
-/* ── Task Completion ── */
-const TaskCompletion = sequelize.define("TaskCompletion", {
-  id:                { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:         { type: DataTypes.STRING, allowNull: false },
-  schedule_entry_id: { type: DataTypes.INTEGER, allowNull: false },
-  date:              { type: DataTypes.DATEONLY, allowNull: false },
-  completed:         { type: DataTypes.BOOLEAN, allowNull: false },
-  title:             { type: DataTypes.STRING, defaultValue: "" },
-}, { tableName: "task_completions", timestamps: true });
-
-/* ── Milestone (sub-tasks for goals) ── */
-const Milestone = sequelize.define("Milestone", {
-  id:          { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  goal_id:     { type: DataTypes.INTEGER, allowNull: false },
-  title:       { type: DataTypes.STRING, allowNull: false },
-  target_value:{ type: DataTypes.FLOAT, allowNull: false },
-  completed:   { type: DataTypes.BOOLEAN, defaultValue: false },
-  sort_order:  { type: DataTypes.INTEGER, defaultValue: 0 },
-  // Removed due_date field
-  frequency:   { type: DataTypes.STRING, defaultValue: "daily" },  // daily, weekly
-}, { tableName: "milestones", timestamps: true });
-
-Goal.hasMany(Milestone, { foreignKey: "goal_id", as: "milestones", onDelete: "CASCADE" });
-Milestone.belongsTo(Goal, { foreignKey: "goal_id" });
-
-
-/* ── Weight / BMI Log ── */
-const WeightLog = sequelize.define("WeightLog", {
-  id:            { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  user_name:     { type: DataTypes.STRING, allowNull: false },
-  date:          { type: DataTypes.DATEONLY, allowNull: false },
-  weight_kg:     { type: DataTypes.FLOAT, allowNull: false },
-  height_cm:     { type: DataTypes.FLOAT, allowNull: false },
-  bmi:           { type: DataTypes.FLOAT, allowNull: false },
-  calories_in:   { type: DataTypes.FLOAT, defaultValue: 0 },        // daily calorie intake
-  calories_out:  { type: DataTypes.FLOAT, defaultValue: 0 },        // daily calories burned
-  goal_type:     { type: DataTypes.STRING, defaultValue: "lose" },   // lose | gain | maintain
-  target_weight: { type: DataTypes.FLOAT },
-  notes:         { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "weight_logs", timestamps: true });
-
-/* ── Milestone Update (progress log for milestones) ── */
-const MilestoneUpdate = sequelize.define("MilestoneUpdate", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  milestone_id: { type: DataTypes.INTEGER, allowNull: false },
-  user_name: { type: DataTypes.STRING, allowNull: false },
-  date: { type: DataTypes.DATEONLY, allowNull: false },
-  value: { type: DataTypes.FLOAT, allowNull: false },
-  note: { type: DataTypes.TEXT, defaultValue: "" },
-}, { tableName: "milestone_updates", timestamps: true });
-
-Milestone.hasMany(MilestoneUpdate, { foreignKey: "milestone_id", as: "updates", onDelete: "CASCADE" });
-MilestoneUpdate.belongsTo(Milestone, { foreignKey: "milestone_id" });
-
-module.exports = {
-  User, ScheduleEntry, HealthMetric, SleepLog, NutritionLog,
-  MoodLog, WorkoutLog, Goal, JournalEntry, HealthRecord, WeightLog, TaskCompletion, Milestone,
-  MilestoneUpdate,
-};
+module.exports = { getCollections, createIndexes, ObjectId };

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ScheduleEntry, TaskCompletion } = require("../models");
+const { getCollections, ObjectId } = require("../models");
 
 // POST /schedule/bulk — Bulk create schedule entries (for templates)
 router.post("/bulk", async (req, res) => {
@@ -18,9 +18,12 @@ router.post("/bulk", async (req, res) => {
       end_time: e.end_time,
       color: e.color || "#6366f1",
       notes: e.notes || "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }));
-    const created = await ScheduleEntry.bulkCreate(rows);
-    return res.status(201).json(created);
+    const collections = await getCollections();
+    const result = await collections.scheduleEntries.insertMany(rows);
+    return res.status(201).json({ insertedIds: result.insertedIds });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -30,8 +33,9 @@ router.post("/bulk", async (req, res) => {
 // DELETE /schedule/all/:user_name — Delete all entries for a user (for template reset)
 router.delete("/all/:user_name", async (req, res) => {
   try {
-    const count = await ScheduleEntry.destroy({ where: { user_name: req.params.user_name } });
-    return res.json({ detail: `Deleted ${count} entries` });
+    const collections = await getCollections();
+    const result = await collections.scheduleEntries.deleteMany({ user_name: req.params.user_name });
+    return res.json({ detail: `Deleted ${result.deletedCount} entries` });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -51,7 +55,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ detail: "day_of_week must be between 0 (Monday) and 6 (Sunday)" });
     }
 
-    const entry = await ScheduleEntry.create({
+    const collections = await getCollections();
+    const result = await collections.scheduleEntries.insertOne({
       user_name,
       title,
       activity_type,
@@ -60,8 +65,10 @@ router.post("/", async (req, res) => {
       end_time,
       color: color || "#6366f1",
       notes: notes || "",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
-    return res.status(201).json(entry);
+    return res.status(201).json({ _id: result.insertedId, user_name, title, activity_type, day_of_week, start_time, end_time });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -72,10 +79,10 @@ router.post("/", async (req, res) => {
 router.get("/:user_name", async (req, res) => {
   try {
     const { user_name } = req.params;
-    const entries = await ScheduleEntry.findAll({
-      where: { user_name },
-      order: [["day_of_week", "ASC"], ["start_time", "ASC"]],
-    });
+    const collections = await getCollections();
+    const entries = await collections.scheduleEntries.find({
+      user_name,
+    }).sort({ day_of_week: 1, start_time: 1 }).toArray();
     return res.json(entries);
   } catch (err) {
     console.error(err);
@@ -87,7 +94,8 @@ router.get("/:user_name", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const entry = await ScheduleEntry.findByPk(id);
+    const collections = await getCollections();
+    const entry = await collections.scheduleEntries.findOne({ _id: new ObjectId(id) });
 
     if (!entry) {
       return res.status(404).json({ detail: "Schedule entry not found" });
@@ -99,7 +107,7 @@ router.put("/:id", async (req, res) => {
       return res.status(400).json({ detail: "day_of_week must be between 0 (Monday) and 6 (Sunday)" });
     }
 
-    await entry.update({
+    const updates = {
       title: title !== undefined ? title : entry.title,
       activity_type: activity_type !== undefined ? activity_type : entry.activity_type,
       day_of_week: day_of_week !== undefined ? day_of_week : entry.day_of_week,
@@ -107,9 +115,11 @@ router.put("/:id", async (req, res) => {
       end_time: end_time !== undefined ? end_time : entry.end_time,
       color: color !== undefined ? color : entry.color,
       notes: notes !== undefined ? notes : entry.notes,
-    });
+      updatedAt: new Date(),
+    };
 
-    return res.json(entry);
+    await collections.scheduleEntries.updateOne({ _id: new ObjectId(id) }, { $set: updates });
+    return res.json({ _id: entry._id, ...updates });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -120,13 +130,13 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const entry = await ScheduleEntry.findByPk(id);
+    const collections = await getCollections();
+    const result = await collections.scheduleEntries.deleteOne({ _id: new ObjectId(id) });
 
-    if (!entry) {
+    if (result.deletedCount === 0) {
       return res.status(404).json({ detail: "Schedule entry not found" });
     }
 
-    await entry.destroy();
     return res.json({ detail: "Schedule entry deleted" });
   } catch (err) {
     console.error(err);
@@ -141,15 +151,17 @@ router.post("/completion", async (req, res) => {
     if (!user_name || !schedule_entry_id || !date || completed === undefined) {
       return res.status(400).json({ detail: "user_name, schedule_entry_id, date, and completed are required" });
     }
+    const collections = await getCollections();
     // Upsert: if already recorded for this entry+date, update it
-    const [record, created] = await TaskCompletion.findOrCreate({
-      where: { user_name, schedule_entry_id, date },
-      defaults: { completed, title: title || "" },
-    });
-    if (!created) {
-      await record.update({ completed, title: title || record.title });
+    const filter = { user_name, schedule_entry_id, date };
+    const existing = await collections.taskCompletions.findOne(filter);
+    if (existing) {
+      await collections.taskCompletions.updateOne(filter, { $set: { completed, title: title || existing.title, updatedAt: new Date() } });
+      return res.status(200).json({ _id: existing._id, ...filter, completed, title: title || existing.title });
+    } else {
+      const result = await collections.taskCompletions.insertOne({ user_name, schedule_entry_id, date, completed, title: title || "", createdAt: new Date(), updatedAt: new Date() });
+      return res.status(201).json({ _id: result.insertedId, user_name, schedule_entry_id, date, completed, title: title || "" });
     }
-    return res.status(created ? 201 : 200).json(record);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -160,10 +172,10 @@ router.post("/completion", async (req, res) => {
 router.get("/completions/:user_name/:date", async (req, res) => {
   try {
     const { user_name, date } = req.params;
-    const completions = await TaskCompletion.findAll({
-      where: { user_name, date },
-      order: [["createdAt", "DESC"]],
-    });
+    const collections = await getCollections();
+    const completions = await collections.taskCompletions.find({
+      user_name, date,
+    }).sort({ createdAt: -1 }).toArray();
     return res.json(completions);
   } catch (err) {
     console.error(err);
@@ -175,10 +187,10 @@ router.get("/completions/:user_name/:date", async (req, res) => {
 router.get("/completions/:user_name", async (req, res) => {
   try {
     const { user_name } = req.params;
-    const completions = await TaskCompletion.findAll({
-      where: { user_name },
-      order: [["date", "DESC"], ["createdAt", "DESC"]],
-    });
+    const collections = await getCollections();
+    const completions = await collections.taskCompletions.find({
+      user_name,
+    }).sort({ date: -1, createdAt: -1 }).toArray();
     return res.json(completions);
   } catch (err) {
     console.error(err);

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const sequelize = require("./database");
+const { connectDB } = require("./database");
+const { createIndexes } = require("./models");
 const config = require("./config");
 
 // Import routes
@@ -42,18 +43,21 @@ app.get("/", (_req, res) => {
 
 // Start server
 async function start() {
-  await sequelize.query("PRAGMA foreign_keys = OFF;");
-  // Drop any leftover backup tables from failed migrations
-  const [tables] = await sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE '%_backup'");
-    for (const table of tables) {
-      await sequelize.query(`DROP TABLE IF EXISTS \`${table.name}\``);
-    }
-    await sequelize.sync({ alter: true }); // auto-migrate for new models
-  await sequelize.query("PRAGMA foreign_keys = ON;");
-  console.log("Database synced (SQLite)");
-  app.listen(config.PORT, () => {
-    console.log(`Server running at http://localhost:${config.PORT}`);
-  });
+  try {
+    const db = await connectDB('wellbeing_tracker');
+    console.log("Connected to MongoDB");
+    
+    // Create indexes
+    await createIndexes();
+    console.log("Indexes created");
+    
+    app.listen(config.PORT, () => {
+      console.log(`Server running at http://localhost:${config.PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
+  }
 }
 
 start().catch((err) => {

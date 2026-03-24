@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Activity } = require("../models");
+const { getCollections, ObjectId } = require("../models");
 
 // POST /activities/
 router.post("/", async (req, res) => {
@@ -11,8 +11,9 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ detail: "user_name, activity_type and value are required" });
     }
 
-    const activity = await Activity.create({ user_name, activity_type, value });
-    return res.status(201).json(activity);
+    const collections = await getCollections();
+    const result = await collections.activities.insertOne({ user_name, activity_type, value, timestamp: new Date() });
+    return res.status(201).json({ _id: result.insertedId, user_name, activity_type, value });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -23,10 +24,10 @@ router.post("/", async (req, res) => {
 router.get("/:user_name", async (req, res) => {
   try {
     const { user_name } = req.params;
-    const activities = await Activity.findAll({
-      where: { user_name },
-      order: [["timestamp", "DESC"]],
-    });
+    const collections = await getCollections();
+    const activities = await collections.activities.find({
+      user_name,
+    }).sort({ timestamp: -1 }).toArray();
     return res.json(activities);
   } catch (err) {
     console.error(err);

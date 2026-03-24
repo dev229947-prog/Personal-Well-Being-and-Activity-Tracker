@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { JournalEntry } = require("../models");
+const { getCollections, ObjectId } = require("../models");
 
 router.post("/", async (req, res) => {
   try {
@@ -9,11 +9,12 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ detail: "user_name and content are required" });
     }
     const entryDate = date || new Date().toISOString().split("T")[0];
-    const entry = await JournalEntry.create({
+    const collections = await getCollections();
+    const result = await collections.journalEntries.insertOne({
       user_name, date: entryDate, title: title || "", content,
-      mood_tag: mood_tag || "", tags: tags || "",
+      mood_tag: mood_tag || "", tags: tags || "", createdAt: new Date(), updatedAt: new Date(),
     });
-    return res.status(201).json(entry);
+    return res.status(201).json({ _id: result.insertedId, user_name, date: entryDate, content });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -22,10 +23,10 @@ router.post("/", async (req, res) => {
 
 router.get("/:user_name", async (req, res) => {
   try {
-    const entries = await JournalEntry.findAll({
-      where: { user_name: req.params.user_name },
-      order: [["date", "DESC"]],
-    });
+    const collections = await getCollections();
+    const entries = await collections.journalEntries.find({
+      user_name: req.params.user_name,
+    }).sort({ date: -1 }).toArray();
     return res.json(entries);
   } catch (err) {
     console.error(err);
@@ -35,16 +36,19 @@ router.get("/:user_name", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const entry = await JournalEntry.findByPk(req.params.id);
+    const collections = await getCollections();
+    const entry = await collections.journalEntries.findOne({ _id: new ObjectId(req.params.id) });
     if (!entry) return res.status(404).json({ detail: "Not found" });
     const { title, content, mood_tag, tags } = req.body;
-    await entry.update({
+    const updates = {
       title: title !== undefined ? title : entry.title,
       content: content !== undefined ? content : entry.content,
       mood_tag: mood_tag !== undefined ? mood_tag : entry.mood_tag,
       tags: tags !== undefined ? tags : entry.tags,
-    });
-    return res.json(entry);
+      updatedAt: new Date(),
+    };
+    await collections.journalEntries.updateOne({ _id: new ObjectId(req.params.id) }, { $set: updates });
+    return res.json({ _id: entry._id, ...updates });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ detail: "Internal server error" });
@@ -53,9 +57,9 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const entry = await JournalEntry.findByPk(req.params.id);
-    if (!entry) return res.status(404).json({ detail: "Not found" });
-    await entry.destroy();
+    const collections = await getCollections();
+    const result = await collections.journalEntries.deleteOne({ _id: new ObjectId(req.params.id) });
+    if (result.deletedCount === 0) return res.status(404).json({ detail: "Not found" });
     return res.json({ detail: "Deleted" });
   } catch (err) {
     console.error(err);
